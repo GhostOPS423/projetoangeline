@@ -1,41 +1,49 @@
 import { TrendingUp, Scale, Clock, Landmark } from "lucide-react";
 import { motion } from "framer-motion";
-
-const cards = [
-  {
-    label: "Honorários do Mês",
-    value: "R$ 84.250,00",
-    change: "+12.4% desde o mês passado",
-    positive: true,
-    icon: TrendingUp,
-    highlight: true,
-  },
-  {
-    label: "Processos Ativos",
-    value: "23",
-    change: "4 novos esta semana",
-    positive: true,
-    icon: Scale,
-  },
-  {
-    label: "Prazos Próximos (48h)",
-    value: "5",
-    change: "2 prazos fatais",
-    positive: false,
-    icon: Clock,
-    urgent: true,
-  },
-  {
-    label: "Saldo em Conta",
-    value: "R$ 142.800,00",
-    change: "Atualizado hoje",
-    positive: true,
-    icon: Landmark,
-    dark: true,
-  },
-];
+import { getHonorariosMes, getSaldoEmConta, getProcessosAtivosCount } from "@/lib/store";
 
 export function MetricCards() {
+  const honorarios = getHonorariosMes();
+  const saldo = getSaldoEmConta();
+  const ativos = getProcessosAtivosCount();
+
+  const fmt = (v: number) =>
+    v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const cards = [
+    {
+      label: "Honorários do Mês",
+      value: fmt(honorarios),
+      change: "Soma das receitas do mês atual",
+      positive: true,
+      icon: TrendingUp,
+      highlight: true,
+    },
+    {
+      label: "Processos Ativos",
+      value: String(ativos),
+      change: `${ativos} caso${ativos !== 1 ? "s" : ""} com status Ativo`,
+      positive: true,
+      icon: Scale,
+    },
+    {
+      label: "Prazos Próximos (48h)",
+      value: "—",
+      change: "Dados da agenda",
+      positive: false,
+      icon: Clock,
+      urgent: false,
+    },
+    {
+      label: "Saldo em Conta",
+      value: fmt(saldo),
+      change: "Receitas − Despesas",
+      positive: saldo >= 0,
+      icon: Landmark,
+      dark: true,
+    },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
       {cards.map((card, i) => (

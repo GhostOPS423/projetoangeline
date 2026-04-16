@@ -5,8 +5,6 @@ import {
   Briefcase,
   Wallet,
   CalendarDays,
-  Settings,
-  HelpCircle,
   Plus,
   ChevronLeft,
   ChevronRight,
@@ -20,12 +18,11 @@ const navItems = [
   { title: "Agenda", path: "/agenda", icon: CalendarDays },
 ];
 
-const footerItems = [
-  { title: "Configurações", path: "/configuracoes", icon: Settings },
-  { title: "Suporte", path: "/suporte", icon: HelpCircle },
-];
+interface Props {
+  onNewCase?: () => void;
+}
 
-export function AppSidebar() {
+export function AppSidebar({ onNewCase }: Props) {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
@@ -88,31 +85,15 @@ export function AppSidebar() {
       {/* CTA */}
       {!collapsed && (
         <div className="px-4 py-4">
-          <button className="w-full py-3 bg-sidebar-hover text-amber-accent text-xs font-bold tracking-widest uppercase rounded shadow-lg hover:bg-sidebar-hover/80 transition-all border border-amber-accent/20 flex items-center justify-center gap-2">
+          <button
+            onClick={onNewCase}
+            className="w-full py-3 bg-sidebar-hover text-amber-accent text-xs font-bold tracking-widest uppercase rounded shadow-lg hover:bg-sidebar-hover/80 hover:shadow-xl transition-all border border-amber-accent/20 flex items-center justify-center gap-2"
+          >
             <Plus size={14} />
             Novo Caso Jurídico
           </button>
         </div>
       )}
-
-      {/* Footer */}
-      <footer className="p-2 space-y-1 border-t border-sidebar-hover/50">
-        {footerItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex items-center gap-3 px-4 py-2 text-sidebar-foreground/50 hover:text-primary-foreground transition-colors",
-              collapsed && "justify-center px-2"
-            )}
-          >
-            <item.icon size={16} />
-            {!collapsed && (
-              <span className="text-xs font-label">{item.title}</span>
-            )}
-          </NavLink>
-        ))}
-      </footer>
     </aside>
   );
 }
