@@ -1,6 +1,19 @@
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, FileSpreadsheet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { exportToExcel } from "@/lib/exportExcel";
+import { toast } from "sonner";
 
 export function TopBar() {
+  const handleExport = () => {
+    try {
+      exportToExcel();
+      toast.success("Relatório exportado com sucesso");
+    } catch (e) {
+      console.error(e);
+      toast.error("Falha ao exportar relatório");
+    }
+  };
+
   return (
     <header className="flex justify-between items-center h-16 px-8 bg-card/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-border">
       <div className="flex items-center gap-4 flex-1">
@@ -15,6 +28,15 @@ export function TopBar() {
             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-accent rounded-md text-sm pl-10 py-2 font-body placeholder:text-muted-foreground"
           />
         </div>
+        <Button
+          onClick={handleExport}
+          variant="outline"
+          size="sm"
+          className="gap-2 text-[10px] font-label uppercase tracking-widest border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all"
+        >
+          <FileSpreadsheet size={14} />
+          Exportar Relatório
+        </Button>
       </div>
 
       <div className="flex items-center gap-4 text-muted-foreground">
