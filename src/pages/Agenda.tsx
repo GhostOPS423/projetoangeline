@@ -19,6 +19,7 @@ import {
   getPrazos,
   getDaysWithEvents,
   deletePrazo,
+  updatePrazo,
   type Prazo,
 } from "@/lib/store";
 import { NovoPrazoModal } from "@/components/NovoPrazoModal";
@@ -226,21 +227,33 @@ export default function Agenda() {
                 {selectedPrazos.map((e) => (
                   <div
                     key={e.id}
-                    className={`p-4 rounded-lg border-l-2 group relative ${
+                    className={`p-4 rounded-lg border-l-2 group relative transition-opacity ${
+                      e.concluido ? "opacity-50" : ""
+                    } ${
                       e.tipo === "fatal"
                         ? "border-destructive bg-destructive/5"
                         : "border-accent bg-accent/5"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      {e.tipo === "fatal" && (
+                      <input
+                        type="checkbox"
+                        checked={!!e.concluido}
+                        onChange={() => {
+                          updatePrazo(e.id, { concluido: !e.concluido });
+                          setLocalRefresh((k) => k + 1);
+                        }}
+                        className="accent-primary cursor-pointer"
+                        title="Marcar como concluído"
+                      />
+                      {e.tipo === "fatal" && !e.concluido && (
                         <AlertTriangle size={12} className="text-destructive" />
                       )}
                       <span className="text-[10px] font-label uppercase tracking-widest text-muted-foreground font-bold">
-                        {e.tipo === "fatal" ? "Prazo Fatal" : "Evento"}
+                        {e.concluido ? "Concluído" : e.tipo === "fatal" ? "Prazo Fatal" : "Evento"}
                       </span>
                     </div>
-                    <p className="text-sm font-serif text-foreground">{e.titulo}</p>
+                    <p className={`text-sm font-serif text-foreground ${e.concluido ? "line-through" : ""}`}>{e.titulo}</p>
                     {e.detalhe && (
                       <p className="text-xs text-muted-foreground italic mt-1">{e.detalhe}</p>
                     )}
