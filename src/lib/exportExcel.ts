@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { getProcessos, getLancamentos } from "./store";
+import { getProcessos, getLancamentos, getPrazos } from "./store";
 
 function autoFitColumns(rows: Record<string, any>[]): { wch: number }[] {
   if (!rows.length) return [];
@@ -64,6 +64,23 @@ export function exportToExcel() {
   wsFin["!cols"] = autoFitColumns(lancamentos.length ? lancamentos : [{ Data: "", Descrição: "", Categoria: "", Valor: "" }]);
   boldHeader(wsFin);
   XLSX.utils.book_append_sheet(wb, wsFin, "Financeiro");
+
+  const prazos = getPrazos()
+    .slice()
+    .sort((a, b) => a.data.localeCompare(b.data))
+    .map((p) => ({
+      Data: new Date(p.data).toLocaleDateString("pt-BR"),
+      Título: p.titulo,
+      Detalhes: p.detalhe || "",
+      Tipo: p.tipo === "fatal" ? "Prazo Fatal" : "Normal",
+    }));
+
+  const wsPrazos = XLSX.utils.json_to_sheet(
+    prazos.length ? prazos : [{ Data: "", Título: "", Detalhes: "", Tipo: "" }]
+  );
+  wsPrazos["!cols"] = autoFitColumns(prazos.length ? prazos : [{ Data: "", Título: "", Detalhes: "", Tipo: "" }]);
+  boldHeader(wsPrazos);
+  XLSX.utils.book_append_sheet(wb, wsPrazos, "Prazos");
 
   const date = new Date().toISOString().slice(0, 10);
   XLSX.writeFile(wb, `sovereign-ledger-${date}.xlsx`);
