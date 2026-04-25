@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronRight, Search, ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { getProcessos, deleteProcesso, updateProcesso, type Processo } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
+import { useStoreSync } from "@/hooks/useStoreSync";
 import {
   Dialog,
   DialogContent,
@@ -19,13 +20,14 @@ const statusStyles: Record<string, string> = {
 
 export default function Processos() {
   const { refreshKey } = useOutletContext<{ refreshKey: number }>();
+  const tick = useStoreSync();
   const [processos, setProcessos] = useState<Processo[]>([]);
   const [search, setSearch] = useState("");
   const [editItem, setEditItem] = useState<Processo | null>(null);
 
   useEffect(() => {
     setProcessos(getProcessos());
-  }, [refreshKey]);
+  }, [refreshKey, tick]);
 
   const reload = () => setProcessos(getProcessos());
 
