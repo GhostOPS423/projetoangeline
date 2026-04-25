@@ -19,6 +19,15 @@ export interface Lancamento {
   data: string; // ISO date
 }
 
+export interface Prazo {
+  id: string;
+  titulo: string;
+  detalhe: string;
+  data: string; // ISO date (yyyy-mm-dd)
+  tipo: "fatal" | "normal";
+  processoId?: string;
+}
+
 function load<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
@@ -109,4 +118,53 @@ export function getSaldoEmConta(): number {
 
 export function getProcessosAtivosCount(): number {
   return getProcessos().filter((p) => p.status === "Ativo").length;
+}
+
+// --- Prazos ---
+const PRAZO_KEY = "sovereign_prazos";
+
+export function getPrazos(): Prazo[] {
+  return load<Prazo[]>(PRAZO_KEY, []);
+}
+
+export function savePrazos(list: Prazo[]) {
+  save(PRAZO_KEY, list);
+}
+
+export function addPrazo(p: Omit<Prazo, "id">): Prazo {
+  const list = getPrazos();
+  const novo: Prazo = { ...p, id: crypto.randomUUID() };
+  list.push(novo);
+  savePrazos(list);
+  return novo;
+}
+
+export function deletePrazo(id: string) {
+  savePrazos(getPrazos().filter((p) => p.id !== id));
+}
+
+// --- Date queries ---
+function sameDay(iso: string, ymd: string): boolean {
+  return iso.slice(0, 10) === ymd;
+}
+
+export function getPrazosByDay(ymd: string): Prazo[] {
+  return getPrazos().filter((p) => sameDay(p.data, ymd));
+}
+
+export function getLancamentosByDay(ymd: string): Lancamento[] {
+  return getLancamentos().filter((l) => sameDay(l.data, ymd));
+}
+
+export function getProcessosByDay(ymd: string): Processo[] {
+  return getProcessos().filter((p) => sameDay(p.criadoEm, ymd));
+}
+
+/** Returns set of ymd strings that have at least one event (prazo, lançamento or novo processo). */
+export function getDaysWithEvents(): Set<string> {
+  const set = new Set<string>();
+  getPrazos().forEach((p) => set.add(p.data.slice(0, 10)));
+  getLancamentos().forEach((l) => set.add(l.data.slice(0, 10)));
+  getProcessos().forEach((p) => set.add(p.criadoEm.slice(0, 10)));
+  return set;
 }
