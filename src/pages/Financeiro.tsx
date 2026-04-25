@@ -4,7 +4,6 @@ import { ChevronRight, TrendingUp, TrendingDown, AlertCircle, Plus, Trash2 } fro
 import { motion } from "framer-motion";
 import { getLancamentos, addLancamento, deleteLancamento, type Lancamento } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
-import { useStoreSync } from "@/hooks/useStoreSync";
 import {
   Dialog,
   DialogContent,
@@ -16,13 +15,12 @@ import { Button } from "@/components/ui/button";
 
 export default function Financeiro() {
   const { refreshKey } = useOutletContext<{ refreshKey: number }>();
-  const tick = useStoreSync();
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setLancamentos(getLancamentos());
-  }, [refreshKey, tick]);
+  }, [refreshKey]);
 
   const reload = () => setLancamentos(getLancamentos());
 
@@ -114,7 +112,6 @@ function NovoLancamentoModal({ onClose, onSaved }: { onClose: () => void; onSave
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
   const [data, setData] = useState(new Date().toISOString().slice(0, 10));
-  const [categoria, setCategoria] = useState("Honorários");
 
   const handleSave = () => {
     if (!descricao.trim() || !valor.trim()) return;
@@ -123,17 +120,12 @@ function NovoLancamentoModal({ onClose, onSaved }: { onClose: () => void; onSave
       descricao,
       valor: parseFloat(valor.replace(/[^\d.,]/g, "").replace(",", ".")) || 0,
       data,
-      categoria,
     });
     onSaved();
   };
 
   const inputClass =
     "w-full bg-muted/50 border border-border focus:outline-none focus:ring-1 focus:ring-accent rounded-md text-sm px-4 py-2.5 font-body placeholder:text-muted-foreground transition-colors hover:border-accent/50";
-
-  const categoriasReceita = ["Honorários", "Consultoria", "Acordo", "Reembolso", "Outros"];
-  const categoriasDespesa = ["Custas", "Transporte", "Aluguel", "Material", "Tributos", "Outros"];
-  const categorias = tipo === "receita" ? categoriasReceita : categoriasDespesa;
 
   return (
     <Dialog open onOpenChange={(v) => !v && onClose()}>
@@ -142,34 +134,24 @@ function NovoLancamentoModal({ onClose, onSaved }: { onClose: () => void; onSave
           <DialogTitle className="font-serif text-xl">Novo Lançamento</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Tipo</label>
-              <select className={inputClass} value={tipo} onChange={(e) => { const t = e.target.value as "receita" | "despesa"; setTipo(t); setCategoria(t === "receita" ? "Honorários" : "Custas"); }}>
-                <option value="receita">Receita</option>
-                <option value="despesa">Despesa</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Categoria</label>
-              <select className={inputClass} value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-                {categorias.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
+          <div>
+            <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Tipo</label>
+            <select className={inputClass} value={tipo} onChange={(e) => setTipo(e.target.value as "receita" | "despesa")}>
+              <option value="receita">Receita (Honorários)</option>
+              <option value="despesa">Despesa</option>
+            </select>
           </div>
           <div>
             <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Descrição *</label>
             <input className={inputClass} placeholder="Ex: Honorários — Cliente X" value={descricao} onChange={(e) => setDescricao(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Valor *</label>
-              <input className={inputClass} placeholder="R$ 0,00" value={valor} onChange={(e) => setValor(e.target.value)} />
-            </div>
-            <div>
-              <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Data</label>
-              <input type="date" className={inputClass} value={data} onChange={(e) => setData(e.target.value)} />
-            </div>
+          <div>
+            <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Valor *</label>
+            <input className={inputClass} placeholder="R$ 0,00" value={valor} onChange={(e) => setValor(e.target.value)} />
+          </div>
+          <div>
+            <label className="text-[10px] font-label uppercase tracking-widest text-muted-foreground mb-1.5 block">Data</label>
+            <input type="date" className={inputClass} value={data} onChange={(e) => setData(e.target.value)} />
           </div>
         </div>
         <DialogFooter>

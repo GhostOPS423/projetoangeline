@@ -4,7 +4,6 @@ import { format, parseISO, differenceInCalendarDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { getPrazos, type Prazo } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
-import { useStoreSync } from "@/hooks/useStoreSync";
 
 interface Props {
   /** Optional yyyy-MM-dd to filter only that day; if omitted, shows next upcoming. */
@@ -13,12 +12,11 @@ interface Props {
 
 export function UrgentDeadlines({ filterDay }: Props) {
   const ctx = useOutletContext<{ refreshKey: number }>() || { refreshKey: 0 };
-  const tick = useStoreSync();
   const [prazos, setPrazos] = useState<Prazo[]>([]);
 
   useEffect(() => {
     setPrazos(getPrazos());
-  }, [ctx?.refreshKey, tick]);
+  }, [ctx?.refreshKey]);
 
   const visible = useMemo(() => {
     const today = new Date();

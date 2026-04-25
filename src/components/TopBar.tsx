@@ -1,55 +1,22 @@
-import { useRef } from "react";
-import { Search, Bell, FileSpreadsheet, Download, Upload } from "lucide-react";
+import { Search, Bell, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exportToExcel } from "@/lib/exportExcel";
-import { downloadBackup, restoreBackup } from "@/lib/store";
 import { toast } from "sonner";
 
 export function TopBar() {
-  const fileRef = useRef<HTMLInputElement>(null);
-
   const handleExport = () => {
     try {
       exportToExcel();
-      toast.success("Relatório Excel exportado");
+      toast.success("Relatório exportado com sucesso");
     } catch (e) {
       console.error(e);
       toast.error("Falha ao exportar relatório");
     }
   };
 
-  const handleBackup = () => {
-    try {
-      downloadBackup();
-      toast.success("Backup JSON salvo");
-    } catch (e) {
-      console.error(e);
-      toast.error("Falha ao gerar backup");
-    }
-  };
-
-  const handleRestoreClick = () => fileRef.current?.click();
-
-  const handleRestoreFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!confirm("Restaurar substituirá todos os dados atuais. Continuar?")) {
-      e.target.value = "";
-      return;
-    }
-    const text = await file.text();
-    const result = restoreBackup(text);
-    if (result.ok) {
-      toast.success("Backup restaurado com sucesso");
-    } else {
-      toast.error(`Falha ao restaurar: ${result.error}`);
-    }
-    e.target.value = "";
-  };
-
   return (
     <header className="flex justify-between items-center h-16 px-8 bg-card/80 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b border-border">
-      <div className="flex items-center gap-3 flex-1">
+      <div className="flex items-center gap-4 flex-1">
         <div className="relative w-full max-w-md">
           <Search
             size={16}
@@ -68,35 +35,8 @@ export function TopBar() {
           className="gap-2 text-[10px] font-label uppercase tracking-widest border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all"
         >
           <FileSpreadsheet size={14} />
-          Excel
+          Exportar Relatório
         </Button>
-        <Button
-          onClick={handleBackup}
-          variant="outline"
-          size="sm"
-          className="gap-2 text-[10px] font-label uppercase tracking-widest border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all"
-          title="Baixar backup JSON com todos os dados"
-        >
-          <Download size={14} />
-          Backup
-        </Button>
-        <Button
-          onClick={handleRestoreClick}
-          variant="outline"
-          size="sm"
-          className="gap-2 text-[10px] font-label uppercase tracking-widest border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all"
-          title="Restaurar dados de um arquivo de backup"
-        >
-          <Upload size={14} />
-          Restaurar
-        </Button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          onChange={handleRestoreFile}
-          className="hidden"
-        />
       </div>
 
       <div className="flex items-center gap-4 text-muted-foreground">

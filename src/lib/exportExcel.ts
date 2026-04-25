@@ -41,8 +41,7 @@ export function exportToExcel() {
     .map((l) => ({
       Data: new Date(l.data).toLocaleDateString("pt-BR"),
       Descrição: l.descricao,
-      Categoria: l.categoria || (l.tipo === "receita" ? "Receita" : "Despesa"),
-      Tipo: l.tipo === "receita" ? "Receita" : "Despesa",
+      Categoria: l.tipo === "receita" ? "Receita" : "Despesa",
       Valor: l.valor,
     }));
 
@@ -60,9 +59,9 @@ export function exportToExcel() {
   const wsFin = XLSX.utils.json_to_sheet(
     lancamentos.length
       ? lancamentos
-      : [{ Data: "", Descrição: "", Categoria: "", Tipo: "", Valor: "" }]
+      : [{ Data: "", Descrição: "", Categoria: "", Valor: "" }]
   );
-  wsFin["!cols"] = autoFitColumns(lancamentos.length ? lancamentos : [{ Data: "", Descrição: "", Categoria: "", Tipo: "", Valor: "" }]);
+  wsFin["!cols"] = autoFitColumns(lancamentos.length ? lancamentos : [{ Data: "", Descrição: "", Categoria: "", Valor: "" }]);
   boldHeader(wsFin);
   XLSX.utils.book_append_sheet(wb, wsFin, "Financeiro");
 

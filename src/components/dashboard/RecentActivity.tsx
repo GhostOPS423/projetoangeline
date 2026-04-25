@@ -11,7 +11,6 @@ import {
   type Prazo,
 } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
-import { useStoreSync } from "@/hooks/useStoreSync";
 
 interface Props {
   /** Optional yyyy-MM-dd to filter activity to that day. */
@@ -29,7 +28,6 @@ type ActivityItem = {
 
 export function RecentActivity({ filterDay }: Props) {
   const ctx = useOutletContext<{ refreshKey: number }>() || { refreshKey: 0 };
-  const tick = useStoreSync();
   const [processos, setProcessos] = useState<Processo[]>([]);
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [prazos, setPrazos] = useState<Prazo[]>([]);
@@ -38,7 +36,7 @@ export function RecentActivity({ filterDay }: Props) {
     setProcessos(getProcessos());
     setLancamentos(getLancamentos());
     setPrazos(getPrazos());
-  }, [ctx?.refreshKey, tick]);
+  }, [ctx?.refreshKey]);
 
   const items = useMemo<ActivityItem[]>(() => {
     const all: ActivityItem[] = [
