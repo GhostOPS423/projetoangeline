@@ -13,11 +13,12 @@ interface Props {
 
 export function UrgentDeadlines({ filterDay }: Props) {
   const ctx = useOutletContext<{ refreshKey: number }>() || { refreshKey: 0 };
+  const tick = useStoreSync();
   const [prazos, setPrazos] = useState<Prazo[]>([]);
 
   useEffect(() => {
     setPrazos(getPrazos());
-  }, [ctx?.refreshKey]);
+  }, [ctx?.refreshKey, tick]);
 
   const visible = useMemo(() => {
     const today = new Date();
