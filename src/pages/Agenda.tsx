@@ -23,6 +23,7 @@ import {
 } from "@/lib/store";
 import { NovoPrazoModal } from "@/components/NovoPrazoModal";
 import { useOutletContext } from "react-router-dom";
+import { useStoreSync } from "@/hooks/useStoreSync";
 
 export default function Agenda() {
   const { refreshKey } = useOutletContext<{ refreshKey: number }>();

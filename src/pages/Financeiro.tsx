@@ -4,6 +4,7 @@ import { ChevronRight, TrendingUp, TrendingDown, AlertCircle, Plus, Trash2 } fro
 import { motion } from "framer-motion";
 import { getLancamentos, addLancamento, deleteLancamento, type Lancamento } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
+import { useStoreSync } from "@/hooks/useStoreSync";
 import {
   Dialog,
   DialogContent,

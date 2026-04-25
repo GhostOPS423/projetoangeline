@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronRight, Search, ArrowUpDown, Pencil, Trash2 } from "lucide-react";
 import { getProcessos, deleteProcesso, updateProcesso, type Processo } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
+import { useStoreSync } from "@/hooks/useStoreSync";
 import {
   Dialog,
   DialogContent,
