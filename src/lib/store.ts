@@ -19,6 +19,15 @@ export interface Lancamento {
   data: string; // ISO date
 }
 
+export interface Prazo {
+  id: string;
+  titulo: string;
+  detalhe: string;
+  data: string; // ISO date (yyyy-mm-dd)
+  tipo: "fatal" | "normal";
+  processoId?: string;
+}
+
 function load<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
