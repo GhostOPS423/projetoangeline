@@ -11,6 +11,7 @@ import {
   type Prazo,
 } from "@/lib/store";
 import { useOutletContext } from "react-router-dom";
+import { useStoreSync } from "@/hooks/useStoreSync";
 
 interface Props {
   /** Optional yyyy-MM-dd to filter activity to that day. */
