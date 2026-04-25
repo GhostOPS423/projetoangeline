@@ -20,13 +20,14 @@ const statusStyles: Record<string, string> = {
 
 export default function Processos() {
   const { refreshKey } = useOutletContext<{ refreshKey: number }>();
+  const tick = useStoreSync();
   const [processos, setProcessos] = useState<Processo[]>([]);
   const [search, setSearch] = useState("");
   const [editItem, setEditItem] = useState<Processo | null>(null);
 
   useEffect(() => {
     setProcessos(getProcessos());
-  }, [refreshKey]);
+  }, [refreshKey, tick]);
 
   const reload = () => setProcessos(getProcessos());
 

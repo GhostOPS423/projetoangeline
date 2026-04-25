@@ -16,12 +16,13 @@ import { Button } from "@/components/ui/button";
 
 export default function Financeiro() {
   const { refreshKey } = useOutletContext<{ refreshKey: number }>();
+  const tick = useStoreSync();
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     setLancamentos(getLancamentos());
-  }, [refreshKey]);
+  }, [refreshKey, tick]);
 
   const reload = () => setLancamentos(getLancamentos());
 

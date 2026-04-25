@@ -27,6 +27,7 @@ import { useStoreSync } from "@/hooks/useStoreSync";
 
 export default function Agenda() {
   const { refreshKey } = useOutletContext<{ refreshKey: number }>();
+  const tick = useStoreSync();
   const [today, setToday] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -39,7 +40,7 @@ export default function Agenda() {
   useEffect(() => {
     setPrazos(getPrazos());
     setEventDays(getDaysWithEvents());
-  }, [refreshKey, localRefresh]);
+  }, [refreshKey, localRefresh, tick]);
 
   // Auto-refresh "today" at midnight
   useEffect(() => {
