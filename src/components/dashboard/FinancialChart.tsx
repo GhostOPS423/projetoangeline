@@ -1,5 +1,4 @@
 import {
-  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -9,20 +8,14 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-
-const data = [
-  { mes: "Jan", receita: 62000, despesa: 28000 },
-  { mes: "Fev", receita: 58000, despesa: 31000 },
-  { mes: "Mar", receita: 71000, despesa: 25000 },
-  { mes: "Abr", receita: 84000, despesa: 33000 },
-  { mes: "Mai", receita: 79000, despesa: 29000 },
-  { mes: "Jun", receita: 92000, despesa: 35000 },
-  { mes: "Jul", receita: 88000, despesa: 30000 },
-  { mes: "Ago", receita: 95000, despesa: 32000 },
-  { mes: "Set", receita: 84250, despesa: 28430 },
-];
+import { getMonthlySeries } from "@/lib/store";
+import { useStoreSync } from "@/hooks/useStoreSync";
 
 export function FinancialChart() {
+  useStoreSync();
+  const data = getMonthlySeries(9);
+  const year = new Date().getFullYear();
+
   return (
     <div className="bg-card p-8 rounded-xl shadow-sm">
       <div className="flex justify-between items-end mb-8">
@@ -31,7 +24,7 @@ export function FinancialChart() {
             Evolução Financeira Mensal
           </h4>
           <p className="text-sm text-muted-foreground">
-            Receitas vs. Despesas — 2024
+            Receitas vs. Despesas — {year}
           </p>
         </div>
         <div className="flex items-center gap-6 text-xs font-label">

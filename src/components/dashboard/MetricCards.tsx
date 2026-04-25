@@ -1,11 +1,21 @@
 import { TrendingUp, Scale, Clock, Landmark } from "lucide-react";
 import { motion } from "framer-motion";
-import { getHonorariosMes, getSaldoEmConta, getProcessosAtivosCount } from "@/lib/store";
+import {
+  getHonorariosMes,
+  getSaldoEmConta,
+  getProcessosAtivosCount,
+  getPrazosProximas48h,
+} from "@/lib/store";
+import { useStoreSync } from "@/hooks/useStoreSync";
 
 export function MetricCards() {
+  // Re-render whenever any store mutation happens
+  useStoreSync();
+
   const honorarios = getHonorariosMes();
   const saldo = getSaldoEmConta();
   const ativos = getProcessosAtivosCount();
+  const prazos48 = getPrazosProximas48h();
 
   const fmt = (v: number) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -28,11 +38,11 @@ export function MetricCards() {
     },
     {
       label: "Prazos Próximos (48h)",
-      value: "—",
-      change: "Dados da agenda",
-      positive: false,
+      value: String(prazos48),
+      change: prazos48 > 0 ? "Atenção a prazos fatais" : "Nenhum prazo iminente",
+      positive: prazos48 === 0,
       icon: Clock,
-      urgent: false,
+      urgent: prazos48 > 0,
     },
     {
       label: "Saldo em Conta",
