@@ -5,6 +5,8 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Relative paths so the built app runs offline from file:// (Electron, Tauri, pendrive, etc.)
+  base: "./",
   server: {
     host: "::",
     port: 8080,
