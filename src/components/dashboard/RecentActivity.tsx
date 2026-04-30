@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileText, Landmark, Gavel, TrendingUp, TrendingDown } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isToday, isYesterday } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   getProcessos,
@@ -24,10 +24,20 @@ type ActivityItem = {
   desc: string;
   date: Date;
   author: string;
+  searchBlob: string;
 };
 
+function formatTimestamp(date: Date): string {
+  if (isToday(date)) return `Hoje às ${format(date, "HH:mm")}`;
+  if (isYesterday(date)) return `Ontem às ${format(date, "HH:mm")}`;
+  return format(date, "dd MMM, yyyy 'às' HH:mm", { locale: ptBR });
+}
+
 export function RecentActivity({ filterDay }: Props) {
-  const ctx = useOutletContext<{ refreshKey: number }>() || { refreshKey: 0 };
+  const ctx = useOutletContext<{ refreshKey: number; searchQuery?: string }>() || {
+    refreshKey: 0,
+  };
+  const searchQuery = (ctx?.searchQuery || "").trim().toLowerCase();
   const [processos, setProcessos] = useState<Processo[]>([]);
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
   const [prazos, setPrazos] = useState<Prazo[]>([]);
@@ -47,45 +57,60 @@ export function RecentActivity({ filterDay }: Props) {
         desc: `${p.cliente} — Processo ${p.numero}${p.tribunal ? ` (${p.tribunal})` : ""}.`,
         date: parseISO(p.criadoEm),
         author: "CRM Jurídico",
+        searchBlob: `${p.cliente} ${p.numero} ${p.tribunal} processo caso`.toLowerCase(),
       })),
       ...lancamentos.map((l) => ({
         id: `lan-${l.id}`,
-        icon: l.tipo === "receita" ? TrendingUp : TrendingDown,
+        icon: l.tipo === "receita" ? TrendingUp : Landmark,
         title: l.tipo === "receita" ? "Receita Registrada:" : "Despesa Registrada:",
         desc: `${l.descricao} — R$ ${l.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}.`,
         date: parseISO(l.data),
         author: "Sistema Financeiro",
+        searchBlob: `${l.descricao} ${l.tipo} financeiro fluxo caixa`.toLowerCase(),
       })),
       ...prazos.map((p) => ({
         id: `prz-${p.id}`,
-        icon: p.tipo === "fatal" ? Gavel : Landmark,
+        icon: p.tipo === "fatal" ? Gavel : FileText,
         title: p.tipo === "fatal" ? "Prazo Fatal:" : "Evento Agendado:",
         desc: `${p.titulo}${p.detalhe ? ` — ${p.detalhe}` : ""}.`,
         date: parseISO(p.data),
         author: "Agenda",
+        searchBlob: `${p.titulo} ${p.detalhe} prazo audiência agenda`.toLowerCase(),
       })),
     ];
 
     let filtered = all;
     if (filterDay) {
-      filtered = all.filter((a) => format(a.date, "yyyy-MM-dd") === filterDay);
+      filtered = filtered.filter((a) => format(a.date, "yyyy-MM-dd") === filterDay);
+    }
+    if (searchQuery) {
+      filtered = filtered.filter((a) => a.searchBlob.includes(searchQuery));
     }
 
-    return filtered.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 8);
-  }, [processos, lancamentos, prazos, filterDay]);
+    return filtered.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 12);
+  }, [processos, lancamentos, prazos, filterDay, searchQuery]);
 
   return (
     <section>
-      <h4 className="text-xl font-serif text-foreground mb-6">
-        {filterDay ? "Atividade do Dia" : "Atividade Recente"}
-      </h4>
+      <div className="flex items-end justify-between mb-6">
+        <h4 className="text-xl font-serif text-foreground">
+          {filterDay ? "Atividade do Dia" : "Atividade Recente"}
+        </h4>
+        {searchQuery && (
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-label">
+            Filtrando por: <span className="text-accent font-bold">"{searchQuery}"</span>
+          </p>
+        )}
+      </div>
 
       {items.length === 0 ? (
         <div className="bg-card p-8 rounded-xl text-center border border-border">
           <p className="text-sm text-muted-foreground italic">
-            {filterDay
-              ? "Sem atividade registrada para este dia."
-              : "Nenhuma atividade registrada ainda. Cadastre processos, lançamentos ou prazos."}
+            {searchQuery
+              ? "Nenhuma atividade corresponde à sua busca."
+              : filterDay
+                ? "Sem atividade registrada para este dia."
+                : "Nenhuma atividade registrada ainda. Cadastre processos, lançamentos ou prazos."}
           </p>
         </div>
       ) : (
@@ -103,7 +128,7 @@ export function RecentActivity({ filterDay }: Props) {
                   <span className="font-bold">{a.title}</span> {a.desc}
                 </p>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2 font-label">
-                  {format(a.date, "dd MMM, yyyy", { locale: ptBR })} • {a.author}
+                  {formatTimestamp(a.date)} • {a.author}
                 </p>
               </div>
             </div>

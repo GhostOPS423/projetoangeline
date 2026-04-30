@@ -7,14 +7,17 @@ import { NovoCasoModal } from "./NovoCasoModal";
 export function AppLayout() {
   const [modalOpen, setModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const bumpRefresh = () => setRefreshKey((k) => k + 1);
 
   return (
     <div className="h-screen flex w-full overflow-hidden">
       <AppSidebar onNewCase={() => setModalOpen(true)} />
       <div className="flex-1 ml-64 flex flex-col overflow-hidden transition-all duration-300">
-        <TopBar />
+        <TopBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         <main className="flex-1 px-12 py-8 overflow-y-auto">
-          <Outlet context={{ refreshKey }} />
+          <Outlet context={{ refreshKey, bumpRefresh, searchQuery }} />
         </main>
       </div>
       {/* Subtle gradient embellishment */}
@@ -22,7 +25,7 @@ export function AppLayout() {
       <NovoCasoModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onSaved={() => setRefreshKey((k) => k + 1)}
+        onSaved={bumpRefresh}
       />
     </div>
   );
