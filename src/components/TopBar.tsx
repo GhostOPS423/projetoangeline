@@ -3,7 +3,12 @@ import { Button } from "@/components/ui/button";
 import { exportToExcel } from "@/lib/exportExcel";
 import { toast } from "sonner";
 
-export function TopBar() {
+interface TopBarProps {
+  searchQuery?: string;
+  onSearchChange?: (v: string) => void;
+}
+
+export function TopBar({ searchQuery = "", onSearchChange }: TopBarProps) {
   const handleExport = () => {
     try {
       exportToExcel();
@@ -24,6 +29,8 @@ export function TopBar() {
           />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => onSearchChange?.(e.target.value)}
             placeholder="Pesquisar processos, casos ou documentos..."
             className="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-accent rounded-md text-sm pl-10 py-2 font-body placeholder:text-muted-foreground"
           />
